@@ -340,6 +340,17 @@
                 opacity: 1;
             }
         }
+        #bio-gif {
+            position: fixed;
+            left: 50%;
+            top: 28%;
+            transform: translate(-50%, -50%);
+            max-width: 80vw;
+            max-height: 80vh;
+            display: none;         /* hidden until clicked */
+            z-index: 2000;         /* above other content */
+            pointer-events: none;  /* doesn't block clicks */
+        }
     </style>
 
 </head>
@@ -384,7 +395,9 @@
     <audio id="audio1" src="audio1.m4a"></audio>
     <audio id="audio2" src="audio2.m4a"></audio>
     <audio id="audio3" src="audio3.m4a"></audio>
-    <audio id="audio4" src="audio4.m4a"></audio>
+    <audio id="audio4" src="audio4.m4a" loop></audio>
+
+     <img id="bio-gif" src="bio nobg.gif" alt="Bio animation">
 
     <script>
         function playOrPauseAudio(audioId) {
@@ -524,10 +537,33 @@ function clearJerryCloud() {
         document.getElementById('audio3').addEventListener('pause', clearJerryCloud);
         document.getElementById('audio3').addEventListener('ended', clearJerryCloud);
 
-        document.querySelector('.anh-face-link').addEventListener('click', function (e) {
-            e.stopPropagation();
-            playOrPauseAudio('audio4');
-        });
+        const anhLink = document.querySelector('.anh-face-link');
+            const bioGif = document.getElementById('bio-gif');
+
+            anhLink.addEventListener('click', function (e) {
+                e.stopPropagation();
+
+                // existing audio toggle
+                playOrPauseAudio('audio4');
+
+                // toggle GIF visibility; restart GIF when shown
+                if (bioGif.style.display === 'none' || !bioGif.style.display) {
+                    // force reload to restart animation (cache-busting)
+                    bioGif.src = 'bio nobg.gif' + '?_=' + Date.now();
+                    bioGif.style.display = 'block';
+                } else {
+                    bioGif.style.display = 'none';
+                    // optional: clear src to fully stop decoding
+                    // bioGif.src = '';
+                }
+            });
+
+            // Optional: hide GIF when audio4 is paused/ended
+            const audio4 = document.getElementById('audio4');
+            if (audio4) {
+                audio4.addEventListener('pause', () => { bioGif.style.display = 'none'; });
+                audio4.addEventListener('ended', () => { bioGif.style.display = 'none'; });
+            }
 
 
 
@@ -552,6 +588,7 @@ function clearJerryCloud() {
         document.getElementById('cornerIcon').onclick = function () {
             window.open(instagramLink, '_blank');
         };
+        
     </script>
 
 
